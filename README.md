@@ -27,10 +27,11 @@ To reproduce Guan&Zhang's submission for SubChallenge1:
 ```
 python train.py [INPUTPATH]
 ```
-the `[INPUTPATH]` indeicates the directory for the input recordings.
+`[INPUTPATH]` is the path of directory containing all the input recordings.
+
 This program will generate a file `prediction.txt` and a new folder `./output/`.
 
-*`prediction.txt` : a data table containing two columns. The first column `dreamID` is the tree id. The second column `nw` is the recomstructed tree in Newick format.
+* `prediction.txt` : a data table containing two columns. The first column `dreamID` is the tree id. The second column `nw` is the recomstructed tree in Newick format.
 * `./output/`: the reconstructed trees in Newich format.
 
 
