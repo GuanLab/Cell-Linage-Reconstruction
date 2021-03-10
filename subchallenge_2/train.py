@@ -10,10 +10,7 @@ from Bio import Phylo
 import math
 from nexus import NexusReader
 from dendropy.calculate import treecompare, treemeasure
-from tree_evaluations import evaluate_normalized_RF_distance,evaluate_triplet_distance, evaluate_triplet_distance_correlation 
 from Bio.Phylo.TreeConstruction import DistanceTreeConstructor,DistanceMatrix,_Matrix
-from sklearn.ensemble import RandomForestRegressor
-from tmc_wrapper.triplets_distance import triplets_score
 from collections import Counter, defaultdict
 import time
 
@@ -176,25 +173,6 @@ def hierachical_clustering(X):
     rec_tree = list(lineage.keys())[0]+'root;'
     #print(rec_tree)
     return rec_tree
-
-
-
-def read_training_pairwise(idx):
-    '''
-    read pairwised recordings and groundtruth(tree) for train/test sets from indexes 
-    '''
-    X_pairs_all = []
-    Y_pairs_all = []
-    for i in idx:
-        X = pd.read_csv('../recording_train/sub1_train_'+str(i)+'.txt', sep = '\t', header = 0, dtype = str)
-        Y = dendropy.Tree.get_from_path('../groundTruth_train/sub1_train_'+str(i)+'.nwk', 'newick')
-        X_pairs, Y_pairs = pairwise_sequence(X,Y)
-        X_pairs_all.extend(X_pairs)
-        Y_pairs_all.extend(Y_pairs)
-    X_pairs_all = np.array(X_pairs_all)
-    Y_pairs_all = np.array(Y_pairs_all)
-    print(X_pairs_all.shape, Y_pairs_all.shape)
-    return X_pairs_all,Y_pairs_all
 
 def main():
     #parser = argparse.ArgumentParser(description='Build Phylogenetic Tree.')
