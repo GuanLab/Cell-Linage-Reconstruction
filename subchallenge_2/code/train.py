@@ -15,6 +15,7 @@ from Bio.Phylo.TreeConstruction import DistanceTreeConstructor,DistanceMatrix,_M
 from sklearn.ensemble import RandomForestRegressor
 from tmc_wrapper.triplets_distance import triplets_score
 from collections import Counter, defaultdict
+import time
 
 def one_hot_embedding(lineage):
     """
@@ -25,7 +26,7 @@ def one_hot_embedding(lineage):
     from collections import defaultdict
     import numpy as np
     all_symbol = []
-    symbol_set =  {x:defaultdict(lambda:0) for x in range(200)}
+    symbol_set =  {x:defaultdict(lambda:0) for x in range(1000)}
     for _,cell in lineage.items():
         for i in range(len(cell)):
             symbol_set[i][cell[i]] +=1
@@ -71,6 +72,7 @@ def fix_gap(record):
     """
     i = 0
     gap = False
+    #print(record)
     record_new = record.copy()
     while i < len(record):
         n = 0
@@ -103,9 +105,11 @@ def find_nearest_pair(lineage, embed,  mutation_all):
     from scipy.sparse import csr_matrix
     #print('finding the nearest pair in',len(lineage),'cells ...')
     num_mutation_all =len(mutation_all)
-    n = len(lineage[0]) #200
-    mat = np.zeros((len(lineage), num_mutation_all*200))  #cell mutation  matrix for 100 cells; every cell has 200 barcodes
-    dist_mat = np.zeros((len(lineage), num_mutation_all*200))
+    #print(lineage.values())
+    #n = len(lineage[0]) #200
+    n = 1000
+    mat = np.zeros((len(lineage), num_mutation_all*n))  #cell mutation  matrix for 100 cells; every cell has 200 barcodes
+    dist_mat = np.zeros((len(lineage), num_mutation_all*n))
     i = 0
     for k, v in lineage.items():
         for idx,state in enumerate(v):
@@ -206,23 +210,21 @@ def main():
     #        shutil.move(filepath, path)
     #    for filepath in glob.glob('./*.txt'):
     #        shutil.move(filepath, path)
-    predfile = open('prediction.txt', 'w')
-    predfile.write("\"dreamID\"\t\"nCells\"\t\"RF\"\t\"Triplet\"\t\"ground\"\t\"rec\"\n")
-    RF_score = 0
-    triplet_score = 0
-    RF_j = 0
-    triplet_j = 0
-    for i in range(1,101):
-        print(i)
-        X = []
-        with  open('../SubC2_train_TXT/SubC2_train_'+format(i,'04d')+'.txt', 'r') as Xfile:
-            for line in Xfile:
+    X = []
+    with  open('../data/C3_test.tsv', 'r') as Xfile:
+        i = 0
+        for line in Xfile:
+            if i > 0:
                 table = line.rstrip().split('\t')
-                X.append((table[0], list(table[1])))
-        Y = dendropy.Tree.get_from_path('../SubC2_train_REF/SubC2_train_'+format(i,'04d')+'_REF.nw', 'newick')
-        rec_tree = hierachical_clustering(X)
-        rec_file = open('SubC2_train_'+format(i,'04d')+'.nw', 'w')
-        rec_file.write(rec_tree)
+                X.append((table[0], table[1:]))
+                #print(len(table[1:]))
+            i += 1
+        #Y = dendropy.Tree.get_from_path('../SubC2_train_REF/SubC2_train_'+format(i,'04d')+'_REF.nw', 'newick')
+    rec_tree = hierachical_clustering(X)
+    rec_file = open('C3_test.nw', 'w')
+    rec_file.write(rec_tree)
 
 if __name__ == '__main__':
+    start_time = time.time()
     main()
+    print("--- %s seconds ---" % (time.time() - start_time))
